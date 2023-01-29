@@ -247,19 +247,20 @@ class Router():
                 multi_message = await self.socket.recv_multipart()
                 #self.log('info', f'multi_message: {multi_message}')
                 ident_vk_bytes, empty, msg = multi_message
-                self.log('info', ident_vk_bytes)
+
 
                 try:
-                    ident_vk_string = ident_vk_bytes.decode('UTF-8')
+                    ident_vk_string = json.dumps(ident_vk_bytes)
                 except Exception as err:
                     self.log('error', f'ERROR DECODING IDENT, {ident_vk_bytes}')
                     self.log('error', err)
                     ident_vk_string = None
 
+                self.log('info', f'{ident_vk_string} {ident_vk_bytes}')
                 self.log('info', f'Received request from {ident_vk_string or ident_vk_bytes}: {msg}')
 
                 if self.message_callback:
-                    asyncio.ensure_future(self.message_callback(ident_vk_string, msg))
+                    asyncio.ensure_future(self.message_callback(ident_vk_bytes, ident_vk_string, msg))
 
             await asyncio.sleep(0)
 
@@ -271,7 +272,7 @@ class Router():
             self.log('info', f'should check {self.should_check}, task_check_for_messages.done(): {self.task_check_for_messages.done()}')
             self.log('info', f'currently approved in cred manager: {self.cred_provider.approved_keys}')
 
-    def send_msg(self, to_vk: str, msg_str: str, ip: str):
+    def send_msg(self, ident_vk_bytes: bytes, ident_vk_string: str, msg_str: str, ip: str):
         #if not self.socket:
         #    raise AttributeError(EXCEPTION_NO_SOCKET)
 
@@ -281,13 +282,11 @@ class Router():
         #if not isinstance(msg_str, str):
         #    raise AttributeError(EXCEPTION_MSG_NOT_STRING)
 
-        ident_vk_bytes = json.dumps(to_vk).encode('UTF-8')
-
-        self.log('info', f'{ident_vk_bytes}, {to_vk}')
+        self.log('info', f'{ident_vk_bytes}, {ident_vk_string}')
 
         #self.log('info', f"[{ident_vk_bytes}, {b''}, {msg_str.encode('UTF-8')}]")
         #self.socket.send(msg_str.encode('UTF-8'))
-        self.log('info', f'Sending PING back to {to_vk}, {ip}')
+        self.log('info', f'Sending PING back to {ident_vk_string}, {ip}')
         self.socket.send_multipart([ident_vk_bytes, b'', msg_str.encode("UTF-8")])
 
     def refresh_cred_provider_vks(self, vk_list: list = []) -> None:
