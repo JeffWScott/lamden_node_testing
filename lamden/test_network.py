@@ -43,7 +43,7 @@ async def router_callback(to_vk: str, msg: str) -> None:
         try:
             router.send_msg(
                 to_vk=to_vk,
-                msg_str=json.dumps({"response": "ping", "from": msg.get('from')}),
+                msg_str=json.dumps({"response": "ping", "from": to_vk}),
                 ip=msg.get('from')
             )
         except Exception as err:

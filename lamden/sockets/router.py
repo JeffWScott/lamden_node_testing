@@ -252,6 +252,7 @@ class Router():
                 try:
                     ident_vk_string = json.loads(ident_vk_bytes.decode('UTF-8'))
                 except Exception as err:
+                    self.log('error', f'ERROR DECODING IDENT, {ident_vk_bytes}')
                     self.log('error', err)
                     ident_vk_string = None
 
@@ -281,6 +282,8 @@ class Router():
         #    raise AttributeError(EXCEPTION_MSG_NOT_STRING)
 
         ident_vk_bytes = json.dumps(to_vk).encode('UTF-8')
+
+        self.log('info', f'{ident_vk_bytes}, {to_vk}')
 
         #self.log('info', f"[{ident_vk_bytes}, {b''}, {msg_str.encode('UTF-8')}]")
         #self.socket.send(msg_str.encode('UTF-8'))
