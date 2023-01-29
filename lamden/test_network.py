@@ -66,7 +66,7 @@ def handle_result(result: Result) -> (dict, None):
     logger.info(result)
     if result.success:
         try:
-            msg_json = result.response
+            msg_json = json.loads(result.response)
             msg_json['success'] = result.success
             return msg_json
 
