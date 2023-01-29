@@ -250,14 +250,9 @@ class Router():
 
                 self.log('info', f'Received request from {ident_vk_bytes}: {msg}')
 
-                try:
-                    ident_vk_string = json.loads(ident_vk_bytes.decode('UTF-8'))
-                except Exception as err:
-                    #self.log('error', err)
-                    ident_vk_string = None
 
                 if self.message_callback:
-                    self.message_callback(ident_vk_string, msg)
+                    self.message_callback(ident_vk_bytes, msg)
 
             await asyncio.sleep(0)
 
@@ -269,21 +264,21 @@ class Router():
             self.log('info', f'should check {self.should_check}, task_check_for_messages.done(): {self.task_check_for_messages.done()}')
             self.log('info', f'currently approved in cred manager: {self.cred_provider.approved_keys}')
 
-    def send_msg(self, to_vk: str, msg_str: str):
+    def send_msg(self, ident_vk_bytes: bytes, msg_str: str):
         if not self.socket:
             raise AttributeError(EXCEPTION_NO_SOCKET)
 
-        if not isinstance(to_vk, str):
-            raise AttributeError(EXCEPTION_TO_VK_NOT_STRING)
+        #if not isinstance(to_vk, str):
+        #    raise AttributeError(EXCEPTION_TO_VK_NOT_STRING)
 
         if not isinstance(msg_str, str):
             raise AttributeError(EXCEPTION_MSG_NOT_STRING)
 
-        ident_vk_bytes = json.dumps(to_vk).encode('UTF-8')
+        #ident_vk_bytes = json.dumps(to_vk).encode('UTF-8')
 
         #self.log('info', f"[{ident_vk_bytes}, {b''}, {msg_str.encode('UTF-8')}]")
-        self.socket.send(msg_str.encode('UTF-8'))
-        #self.socket.send_multipart([ident_vk_bytes, b'', msg_str.encode("UTF-8")])
+        #self.socket.send(msg_str.encode('UTF-8'))
+        self.socket.send_multipart([ident_vk_bytes, b'', msg_str.encode("UTF-8")])
 
     def refresh_cred_provider_vks(self, vk_list: list = []) -> None:
         for vk in vk_list:
