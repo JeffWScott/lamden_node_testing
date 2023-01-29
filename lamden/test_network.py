@@ -89,6 +89,7 @@ async def ping_everyone(node_ips: list, ctx, wallet: Wallet):
     print("ping_everyone")
     peers = []
     for ip in node_ips:
+        print(IP_MAP[ip])
         r = Request(
             to_address=request_address(ip=ip),
             ctx=ctx,
