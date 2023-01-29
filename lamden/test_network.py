@@ -63,6 +63,7 @@ async def send_ping(request) -> dict:
         print(error)
 
 def handle_result(result: Result) -> (dict, None):
+    logger.info(result)
     if result.success:
         try:
             msg_json = result.response
