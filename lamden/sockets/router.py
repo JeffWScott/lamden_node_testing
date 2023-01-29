@@ -253,16 +253,13 @@ class Router():
                 try:
                     ident_vk_string = json.loads(ident_vk_bytes.decode('UTF-8'))
                 except Exception as err:
-                    self.log('error', err)
+                    #self.log('error', err)
                     ident_vk_string = None
 
                 if self.message_callback:
                     asyncio.ensure_future(self.message_callback(ident_vk_string, msg))
 
-                await asyncio.sleep(0)
-            else:
-                await asyncio.sleep(0)
-                # self.log('info', 'No Messages Found!')
+            await asyncio.sleep(0)
 
         self.log('info', 'Stopped Checking for messages.')
 
