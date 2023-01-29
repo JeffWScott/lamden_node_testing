@@ -31,10 +31,8 @@ async def run():
         await asyncio.sleep(0)
 
 async def router_callback(ident_vk_bytes: str, msg: str) -> None:
-
     log = get_logger("ROUTER_CALLBACK")
     try:
-        log.info(msg)
         msg = json.loads(msg)
         action = msg.get('action')
     except Exception as err:
@@ -42,7 +40,6 @@ async def router_callback(ident_vk_bytes: str, msg: str) -> None:
         return
 
     if action == ACTION_PING:
-        #log.info(f"RESPONDING TO {msg.get('from')}")
         try:
             router.send_msg(
                 ident_vk_bytes=ident_vk_bytes,
@@ -60,7 +57,6 @@ async def send_ping(request) -> dict:
         str_msg = json.dumps(msg_obj)
     except Exception as err:
         print(err)
-
         return None
 
     try:
