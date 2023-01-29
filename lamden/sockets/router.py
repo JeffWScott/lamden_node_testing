@@ -278,6 +278,7 @@ class Router():
 
         #self.log('info', f"[{ident_vk_bytes}, {b''}, {msg_str.encode('UTF-8')}]")
         #self.socket.send(msg_str.encode('UTF-8'))
+        self.log(f'Sending back to {ident_vk_bytes}')
         self.socket.send_multipart([ident_vk_bytes, b'', msg_str.encode("UTF-8")])
 
     def refresh_cred_provider_vks(self, vk_list: list = []) -> None:
