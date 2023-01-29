@@ -4,7 +4,7 @@ import zmq
 import zmq.asyncio
 from lamden.logger.base import get_logger
 from lamden.crypto.wallet import Wallet
-from contracting.db.encoder import encode
+#from contracting.db.encoder import encode
 from lamden.sockets.monitor import SocketMonitor
 from typing import Callable
 
@@ -102,7 +102,7 @@ class Request():
         self.socket.curve_secretkey = self.local_wallet.curve_sk
         self.socket.curve_publickey = self.local_wallet.curve_vk
         self.socket.curve_serverkey = self.server_curve_vk
-        self.socket.identity = encode(self.id).encode()
+        #self.socket.identity = encode(self.id).encode()
 
     def setup_polling(self) -> None:
         self.pollin = zmq.asyncio.Poller()
