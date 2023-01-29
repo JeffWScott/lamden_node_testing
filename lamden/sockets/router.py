@@ -245,7 +245,7 @@ class Router():
         while self.should_check:
             if await self.has_message(timeout_ms=self.poll_time_ms):
                 multi_message = await self.socket.recv_multipart()
-                self.log('info', f'multi_message: {multi_message}')
+                #self.log('info', f'multi_message: {multi_message}')
                 ident_vk_bytes, empty, msg = multi_message
 
                 self.log('info', f'Received request from {ident_vk_bytes}: {msg}')
