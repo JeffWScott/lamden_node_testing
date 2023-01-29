@@ -35,11 +35,12 @@ def router_callback(ident_vk_bytes: str, msg: str) -> None:
         return
 
     if action == ACTION_PING:
-        log.info(f"RESPONDING TO {msg.get('from')}")
+        #log.info(f"RESPONDING TO {msg.get('from')}")
         try:
             router.send_msg(
                 ident_vk_bytes=ident_vk_bytes,
-                msg_str=json.dumps({"response": "ping", "from": msg.get('from')})
+                msg_str=json.dumps({"response": "ping", "from": msg.get('from')}),
+                ip=msg.get('from')
             )
         except Exception as err:
             log.error(str(err))
