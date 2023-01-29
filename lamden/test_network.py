@@ -70,10 +70,10 @@ def handle_result(result: Result) -> (dict, None):
             return msg_json
 
         except Exception as err:
-            print(err)
+            logger.error(err)
 
     if result.error:
-        print(result.error)
+        logger.error(result.error)
 
     return None
 
@@ -94,7 +94,8 @@ async def ping_everyone(node_ips: list, ctx):
     while True:
         for peer in peers:
             print(f'Sending ping to {peer.to_address}')
-            await send_ping(peer)
+            res = await send_ping(peer)
+            logger.info(res)
 
         print("Done Sending, waiting a few seconds before going again...")
         await asyncio.sleep(20)
