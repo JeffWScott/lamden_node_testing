@@ -86,7 +86,7 @@ async def ping_everyone(node_ips: list, ctx):
             await send_ping(peer)
 
         print("Done Sending, waiting a few seconds before going again...")
-        await asyncio.sleep(5)
+        await asyncio.sleep(20)
 
 async def wait_for_start(router: Router):
     while not router.is_running:
