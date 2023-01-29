@@ -11,6 +11,12 @@ import uvloop
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 import zmq.asyncio
 
+IP_MAP = {
+   "134.122.98.27": "99339662e90b18249985bc377e4274ccc1de88a3d34a94f3f89a7a7fcad72680",
+    "64.225.32.184": "c017239027e9880d35d90e19add32aefaf722bbfe5e0591b975d79e2be9c1295",
+    "170.64.178.113": "c019700b432ef40a958be4e84b7d724f66b83951d84e3bff58e25eb14dba5583"
+
+}
 
 ACTION_PING = "ping"
 
@@ -81,11 +87,16 @@ def handle_result(result: Result) -> (dict, None):
 def request_address(ip: str) -> str:
     return 'tcp://{}:{}'.format(ip, 19000)
 
-async def ping_everyone(node_ips: list, ctx):
+async def ping_everyone(node_ips: list, ctx, wallet: Wallet):
     print("ping_everyone")
     peers = []
     for ip in node_ips:
-        r = Request(to_address=request_address(ip=ip), ctx=ctx)
+        r = Request(
+            to_address=request_address(ip=ip),
+            ctx=ctx,
+            server_curve_vk=IP_MAP[ip],
+            local_wallet=wallet
+        )
         r.start()
         peers.append(r)
 
@@ -132,9 +143,14 @@ if __name__ == '__main__':
         network_ip=external_address
     )
     router.set_address(port=19000)
+    router.refresh_cred_provider_vks(vk_list=[
+        "c017239027e9880d35d90e19add32aefaf722bbfe5e0591b975d79e2be9c1295",
+        "c019700b432ef40a958be4e84b7d724f66b83951d84e3bff58e25eb14dba5583",
+        "99339662e90b18249985bc377e4274ccc1de88a3d34a94f3f89a7a7fcad72680"
+    ])
 
-    router.run_open_server()
-    #router.run_curve_server()
+    #router.run_open_server()
+    router.run_curve_server()
 
     tasks = asyncio.gather(
         wait_for_start(router)
@@ -143,7 +159,7 @@ if __name__ == '__main__':
     loop.run_until_complete(tasks)
 
     tasks = asyncio.gather(
-        ping_everyone(node_ips=node_ips, ctx=ctx)
+        ping_everyone(node_ips=node_ips, ctx=ctx, wallet=wallet)
     )
     loop = asyncio.get_event_loop()
     loop.run_until_complete(tasks)
