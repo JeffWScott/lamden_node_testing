@@ -23,7 +23,7 @@ async def run():
     while True:
         await asyncio.sleep(0)
 
-def router_callback(ident_vk_bytes: str, msg: str) -> None:
+async def router_callback(ident_vk_bytes: str, msg: str) -> None:
 
     log = get_logger("ROUTER_CALLBACK")
     try:
@@ -134,6 +134,7 @@ if __name__ == '__main__':
     router.set_address(port=19000)
 
     router.run_open_server()
+    #router.run_curve_server()
 
     tasks = asyncio.gather(
         wait_for_start(router)

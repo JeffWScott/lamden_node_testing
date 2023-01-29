@@ -252,7 +252,7 @@ class Router():
 
 
                 if self.message_callback:
-                    self.message_callback(ident_vk_bytes, msg)
+                    asyncio.ensure_future(self.message_callback(ident_vk_bytes, msg))
 
             await asyncio.sleep(0)
 
