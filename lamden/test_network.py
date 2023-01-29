@@ -1,6 +1,7 @@
 from lamden.sockets.request import Request, Result
 from lamden.sockets.router import Router
 from lamden.logger.base import get_logger
+from lamden.crypto.z85 import z85_key
 
 from lamden.crypto.wallet import Wallet
 import os, json
@@ -94,7 +95,7 @@ async def ping_everyone(node_ips: list, ctx, wallet: Wallet):
         r = Request(
             to_address=request_address(ip=ip),
             ctx=ctx,
-            server_curve_vk=IP_MAP[ip],
+            server_curve_vk=z85_key(IP_MAP[ip]),
             local_wallet=wallet
         )
         r.start()
