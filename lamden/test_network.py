@@ -35,7 +35,7 @@ async def router_callback(ident_vk_string: str, msg: str) -> None:
         return
 
     if action == ACTION_PING:
-        log.ino(f"RESPONDING TO {msg.get('from')}")
+        log.info(f"RESPONDING TO {msg.get('from')}")
         router.send_msg(
             to_vk="",
             msg_str=json.dumps({"response": "ping", "from": msg.get('from')})
