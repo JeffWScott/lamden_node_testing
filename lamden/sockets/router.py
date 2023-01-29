@@ -247,10 +247,10 @@ class Router():
                 multi_message = await self.socket.recv_multipart()
                 #self.log('info', f'multi_message: {multi_message}')
                 ident_vk_bytes, empty, msg = multi_message
-
+                self.log('info', ident_vk_bytes)
 
                 try:
-                    ident_vk_string = json.loads(ident_vk_bytes.decode('UTF-8'))
+                    ident_vk_string = ident_vk_bytes.decode('UTF-8')
                 except Exception as err:
                     self.log('error', f'ERROR DECODING IDENT, {ident_vk_bytes}')
                     self.log('error', err)
