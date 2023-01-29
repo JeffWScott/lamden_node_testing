@@ -36,12 +36,12 @@ async def router_callback(ident_vk_string: str, msg: str) -> None:
 
     if action == ACTION_PING:
         router.send_msg(
-            to_vk=ident_vk_string,
-            msg_str=json.dumps({"response": "ping", "from": ident_vk_string})
+            to_vk="",
+            msg_str=json.dumps({"response": "ping", "from": msg.get('from')})
         )
 
 async def send_ping(request) -> dict:
-    msg_obj = {'action': ACTION_PING}
+    msg_obj = {'action': ACTION_PING, 'from': request.to_address}
 
     try:
         str_msg = json.dumps(msg_obj)
