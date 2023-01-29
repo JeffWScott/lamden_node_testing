@@ -1,19 +1,22 @@
 from lamden.sockets.request import Request, Result
 from lamden.sockets.router import Router
+from lamden.logger.base import get_logger
 
 from lamden.crypto.wallet import Wallet
 import os, json
 import requests
 import asyncio
 import uvloop
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
-import zmq
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 import zmq.asyncio
 
 
 ACTION_PING = "ping"
 
+logger = get_logger("MAIN")
+
+router = None
 
 async def run():
     print("RUNNING")
@@ -21,16 +24,17 @@ async def run():
         await asyncio.sleep(0)
 
 async def router_callback(self, ident_vk_string: str, msg: str) -> None:
+    log = get_logger("ROUTER_CALLBACK")
     try:
-        self.log('info', {'ident_vk_string': ident_vk_string, 'msg': msg})
+        log.info(msg)
         msg = json.loads(msg)
         action = msg.get('action')
     except Exception as err:
-        self.log('error', str(err))
+        log.error(str(err))
         return
 
     if action == ACTION_PING:
-        self.router.send_msg(
+        router.send_msg(
             to_vk=ident_vk_string,
             msg_str=json.dumps({"response": "ping", "from": ident_vk_string})
         )
