@@ -23,7 +23,7 @@ async def run():
     while True:
         await asyncio.sleep(0)
 
-async def router_callback(ident_vk_string: str, msg: str) -> None:
+def router_callback(ident_vk_string: str, msg: str) -> None:
 
     log = get_logger("ROUTER_CALLBACK")
     try:

@@ -257,7 +257,7 @@ class Router():
                     ident_vk_string = None
 
                 if self.message_callback:
-                    asyncio.ensure_future(self.message_callback(ident_vk_string, msg))
+                    self.message_callback(ident_vk_string, msg)
 
             await asyncio.sleep(0)
 
@@ -281,6 +281,7 @@ class Router():
 
         ident_vk_bytes = json.dumps(to_vk).encode('UTF-8')
 
+        self.log('info', f"[{ident_vk_bytes}, {b''}, {msg_str.encode('UTF-8')}]")
         self.socket.send_multipart([ident_vk_bytes, b'', msg_str.encode("UTF-8")])
 
     def refresh_cred_provider_vks(self, vk_list: list = []) -> None:
