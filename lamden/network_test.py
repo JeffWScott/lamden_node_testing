@@ -11,14 +11,8 @@ from lamden.utils import hlc
 from lamden.peer import Peer, ACTION_HELLO, ACTION_PING, ACTION_GET_BLOCK, ACTION_GET_LATEST_BLOCK, ACTION_GET_NEXT_BLOCK, ACTION_GET_NETWORK_MAP
 
 from lamden.crypto.wallet import Wallet
-from lamden.storage import BlockStorage, get_latest_block_height
-
 from lamden.logger.base import get_logger
 
-from contracting.db.encoder import encode
-from contracting.db.driver import ContractDriver
-
-from lamden.sockets.publisher import Publisher
 from lamden.sockets.router import Router
 
 WORK_SERVICE = 'work'
@@ -51,44 +45,27 @@ class NewPeerProcessor(Processor):
         self.new_peer_callback(msg=msg)
 
 class Network:
-    def __init__(self, wallet: Wallet = Wallet(), driver: ContractDriver = ContractDriver(),
-                 block_storage: BlockStorage = None, socket_ports: dict = None, local: bool = False):
-
+    def __init__(self, wallet: Wallet = Wallet()):
+        print("here")
         self.wallet = wallet
-        self.driver = driver
-        self.block_storage = block_storage if block_storage is not None else BlockStorage()
 
-        self.local = local
+        self.local = False
 
-        try:
-            self.socket_ports = dict(socket_ports)
-        except TypeError:
-            self.socket_ports =  dict({
-                'router': 19000,
-                'publisher': 19080,
-                'webserver': 18080
-            })
+        self.socket_ports =  dict({
+            'router': 19000,
+            'publisher': 19080,
+            'webserver': 18080
+        })
 
         self.peers = {}
-        self.subscriptions = []
-        self.services = {}
-
-        if self.local:
-            self.external_ip = '127.0.0.1'
-        else:
-            self.external_ip = requests.get('http://api.ipify.org').text
-
-        self.add_service("new_peer_connection", NewPeerProcessor(callback=self.new_peer_connection_service))
+        self.external_ip = requests.get('http://api.ipify.org').text
 
         self.ctx = zmq.asyncio.Context()
 
         self.loop = None
         self.setup_event_loop()
 
-        self.setup_publisher()
         self.setup_router()
-
-        self.heath_check_task = None
 
         self.running = False
 
@@ -166,12 +143,6 @@ class Network:
         self.router.cred_provider.network_ip = self.external_address
         self.publisher.network_ip = self.external_address
 
-    def setup_publisher(self):
-        self.publisher = Publisher(
-            ctx=self.ctx,
-            network_ip=self.external_address
-        )
-        self.publisher.set_address(port=self.socket_ports.get('publisher'))
 
     def setup_router(self):
         self.router = Router(
@@ -183,14 +154,11 @@ class Network:
         self.router.set_address(port=self.socket_ports.get('router'))
 
     def start(self) -> None:
+        self.log('info', 1)
         try:
-            self.log('info', f'Publisher Address {self.publisher_address}')
             self.log('info', f'Router Address {self.router_address}')
 
-            self.publisher.start()
-            self.router.run_curve_server()
-
-            # self.start_health_check()
+            self.router.run_open_server()
 
             asyncio.ensure_future(self.starting())
 
@@ -198,8 +166,8 @@ class Network:
             print (err)
 
     async def starting(self) -> None:
-        while not self.publisher.is_running or not self.router.is_running:
-            await asyncio.sleep(0.1)
+        while not self.router.is_running:
+            await asyncio.sleep(0)
 
         self.running = True
 

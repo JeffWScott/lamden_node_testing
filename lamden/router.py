@@ -8,6 +8,9 @@ from zmq.auth.certs import load_certificate
 from lamden.logger.base import get_logger
 import pathlib
 import os
+
+import json
+
 CERT_DIR = 'cilsocks'
 DEFAULT_DIR = pathlib.Path.home() / CERT_DIR
 
@@ -141,10 +144,13 @@ class JSONAsyncInbox(AsyncInbox):
         _id = await self.socket.recv()
         msg = await self.socket.recv()
 
-        return _id, decode(msg)
+        msg = json.loads(msg)
+
+        return _id, msg
 
     async def return_msg(self, _id, msg):
-        msg = encode(msg).encode()
+        msg = json.dumps(msg, separators=(',', ':')).encode()
+
         await super().return_msg(_id, msg)
 
 
@@ -160,7 +166,7 @@ class Router(JSONAsyncInbox):
         service = msg.get('service')
         request = msg.get('msg')
 
-        self.log.debug(f'Message recieved for: {service}.')
+        ## self.log.debug(f'Message recieved for: {service}.')
 
         if service is None:
             self.log.debug('No service found for message.')
@@ -219,7 +225,7 @@ async def secure_send(msg: dict, service, wallet: Wallet, vk, ip, ctx: zmq.async
 
     payload = encode(message).encode()
 
-    await socket.send(payload, flags=zmq.NOBLOCK)
+    await socket.send(payload)
     socket.close()
 
 
@@ -277,3 +283,32 @@ async def secure_multicast(msg: dict, service, wallet: Wallet, peer_map: dict, c
         )
 
     await asyncio.gather(*coroutines)
+
+
+def build_secure_socket(wallet: Wallet, vk: str, ip: str, ctx: zmq.asyncio.Context, linger=500, cert_dir=DEFAULT_DIR):
+    socket = ctx.socket(zmq.DEALER)
+    socket.setsockopt(zmq.LINGER, linger)
+    socket.setsockopt(zmq.TCP_KEEPALIVE, 1)
+
+    socket.curve_secretkey = wallet.curve_sk
+    socket.curve_publickey = wallet.curve_vk
+
+    filename = str(cert_dir / f'{vk}.key')
+    if not os.path.exists(filename):
+        return None
+
+    server_pub, _ = load_certificate(filename)
+
+    socket.curve_serverkey = server_pub
+
+    try:
+        socket.connect(ip)
+    except ZMQBaseError:
+        socket.close()
+        return None
+
+    return socket
+
+
+def discover_peer():
+    pass

@@ -1,28 +1,26 @@
 from setuptools import setup, find_packages
 
 
-__version__ = '1.0.4.1'
+__version__ = '2.0.0.0'
 
 with open("README.md", "r") as fh:
     long_desc = fh.read()
 
 
 setup(
-    name='lamden',
+    name='zmq_test',
     version=__version__,
     packages=find_packages(),
     install_requires=[
-        "sanic",
-        "coloredlogs",
-        "pymongo",
-        "pyzmq",
-        "requests",
-        "contracting",
-        "checksumdir",
-        "pynacl",
-        "stdlib_list",
-        "python-socketio",
-        "aiohttp"
+        "chardet==3.0.4",
+        "typing_extensions==3.10.0.0",  # locking dep for pyzmq
+        "uvloop==0.14.0",
+        "coloredlogs==15.0.1",
+        "requests==2.25.1",
+        "checksumdir==1.2.0",
+        "pynacl==1.5.0",
+        "stdlib_list==0.8.0",
+        "iso8601"
     ],
     entry_points={
         'console_scripts': [
