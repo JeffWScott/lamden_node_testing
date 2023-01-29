@@ -282,7 +282,8 @@ class Router():
         ident_vk_bytes = json.dumps(to_vk).encode('UTF-8')
 
         self.log('info', f"[{ident_vk_bytes}, {b''}, {msg_str.encode('UTF-8')}]")
-        self.socket.send_multipart([ident_vk_bytes, b'', msg_str.encode("UTF-8")])
+        self.socket.send("RESPONSE")
+        #self.socket.send_multipart([ident_vk_bytes, b'', msg_str.encode("UTF-8")])
 
     def refresh_cred_provider_vks(self, vk_list: list = []) -> None:
         for vk in vk_list:
