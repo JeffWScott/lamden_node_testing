@@ -12,7 +12,7 @@ import zmq
 import zmq.asyncio
 
 
-from lamden.peer import ACTION_PING
+ACTION_PING = "ping"
 
 
 async def run():
