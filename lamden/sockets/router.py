@@ -204,7 +204,7 @@ class Router():
 
         if not self.socket:
             raise AttributeError(EXCEPTION_NO_SOCKET)
-
+        print(self.address)
         self.socket.bind(self.address)
 
     def run_open_server(self):

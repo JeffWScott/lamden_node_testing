@@ -24,6 +24,7 @@ __pycache__/
 *.ps
 
 lamden.egg-info/
+zmq_test.egg-info/
 capnproto-c++-0.7.0/
 capnproto/
 var/
